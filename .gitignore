@@ -1,0 +1,73 @@
+# ========================
+# Environment & Secrets
+# ========================
+.env
+.env.local
+.env.*.local
+
+# ========================
+# Go build artifacts
+# ========================
+/bin/
+/build/
+/app
+*.exe
+*.out
+*.test
+
+# ========================
+# Vendor / Dependencies
+# ========================
+/vendor/
+
+# ========================
+# Docker
+# ========================
+docker-compose.override.yml
+**/docker-compose.override.yml
+**/Dockerfile.*.local
+**/Dockerfile.*.tmp
+
+# Docker volumes / temporary data
+*.log
+*.pid
+*.sock
+*.tmp
+
+# ========================
+# IDEs / Editors
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# ========================
+# OS Files
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# Node / Frontend (if any)
+# ========================
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ========================
+# Coverage & Testing
+# ========================
+/coverage/
+*.prof
+*.coverprofile
+
+# ========================
+# Misc / temporary
+# ========================
+*.bak
+*.old
+*.orig
