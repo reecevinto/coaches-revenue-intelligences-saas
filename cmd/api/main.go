@@ -65,7 +65,7 @@ func main() {
 	userService := users.NewService(userRepo)
 	authService := auth.NewService(userRepo, jwtService)
 
-	// prevent unused warnings until handlers use them
+	// prevent unused warning
 	_ = accountService
 
 	// =============================
@@ -74,19 +74,44 @@ func main() {
 
 	r := chi.NewRouter()
 
-	// global middleware
-	r.Use(middleware.RequestID)
+	// =============================
+	// Gateway Middleware Stack
+	// =============================
 
-	// health check
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Logger)
+	r.Use(middleware.RateLimiter)
+
+	// =============================
+	// Health Check
+	// =============================
+
 	r.Get("/health", middleware.HealthHandler)
 
-	// -------- USERS ROUTES --------
-	userHandler := users.NewHandler(userService)
-	userHandler.RegisterRoutes(r)
+	// =============================
+	// API v1 Routes
+	// =============================
 
-	// -------- AUTH ROUTES --------
-	authHandler := auth.NewHandler(authService)
-	authHandler.RegisterRoutes(r)
+	r.Route("/api/v1", func(api chi.Router) {
+
+		// -------- PUBLIC AUTH ROUTES --------
+
+		authHandler := auth.NewHandler(authService)
+		authHandler.RegisterRoutes(api)
+
+		// -------- PROTECTED ROUTES --------
+
+		api.Group(func(protected chi.Router) {
+
+			// inject jwt middleware WITH service
+			protected.Use(middleware.Auth(jwtService))
+
+			userHandler := users.NewHandler(userService)
+			userHandler.RegisterRoutes(protected)
+
+		})
+	})
 
 	// =============================
 	// 6️⃣ HTTP Server Configuration
@@ -138,5 +163,4 @@ func main() {
 	}
 
 	log.Info().Msg("server exited cleanly")
-
 }
